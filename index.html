@@ -1,0 +1,1690 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Aula 5 — Grécia e Roma</title>
+<style>
+  :root {
+    --bg: #F4EFE6;
+    --bg-deep: #1A1814;
+    --ink: #1A1814;
+    --ink-soft: #4A4640;
+    --paper: #FBF7EF;
+    --accent: #B8862F;
+    --accent-soft: #E8C77A;
+    --line: rgba(26,24,20,0.12);
+    --correct: #2E7D4F;
+    --wrong: #B5342B;
+    --serif: Georgia, 'Times New Roman', serif;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.5;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .app {
+    position: fixed;
+    inset: 0;
+    max-width: 480px;
+    margin: 0 auto;
+    background: var(--bg);
+    overflow: hidden;
+  }
+
+  .progress {
+    position: absolute;
+    top: 10px; left: 12px; right: 12px;
+    height: 18px;
+    display: flex;
+    gap: 3px;
+    z-index: 50;
+    align-items: center;
+    cursor: pointer;
+  }
+  .seg {
+    flex: 1;
+    height: 3px;
+    background: rgba(26,24,20,0.12);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+    transition: height 0.2s ease;
+  }
+  .seg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+  .seg.done::after { transform: scaleX(1); }
+  .seg.current::after { transform: scaleX(1); }
+  .seg.current { height: 4px; }
+
+  .header {
+    position: absolute;
+    top: 34px; left: 0; right: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 24px;
+    z-index: 40;
+    pointer-events: none;
+  }
+  .header span {
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-weight: 500;
+  }
+
+  .slides { position: absolute; inset: 0; }
+  .slide {
+    position: absolute;
+    inset: 0;
+    padding: 80px 28px 70px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    opacity: 0;
+    transform: translateX(40px);
+    transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    pointer-events: none;
+    overflow-y: auto;
+  }
+  .slide.active {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+  }
+  .slide.prev { transform: translateX(-40px); }
+
+  .eyebrow {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 18px;
+  }
+
+  h1 {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: clamp(28px, 8vw, 38px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 16px;
+  }
+  h1 em, h2 em {
+    font-style: italic;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  h2 {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: clamp(24px, 7vw, 32px);
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    margin-bottom: 14px;
+  }
+  h3 {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 500;
+    font-size: 20px;
+    color: var(--ink-soft);
+    margin-bottom: 12px;
+  }
+  p {
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.55;
+    color: var(--ink);
+    font-weight: 400;
+  }
+  p + p { margin-top: 14px; }
+  .big {
+    font-family: var(--serif);
+    font-size: clamp(22px, 6.5vw, 28px);
+    line-height: 1.25;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .quote {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--ink);
+    border-left: 2px solid var(--accent);
+    padding-left: 18px;
+    margin: 8px 0;
+  }
+  .number {
+    font-family: var(--serif);
+    font-size: 88px;
+    font-weight: 800;
+    line-height: 0.9;
+    color: var(--accent);
+    letter-spacing: -0.04em;
+  }
+  .label {
+    font-family: var(--sans);
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-weight: 600;
+  }
+
+  .slide.active > * {
+    animation: fadeUp 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) backwards;
+  }
+  .slide.active > *:nth-child(1) { animation-delay: 0.05s; }
+  .slide.active > *:nth-child(2) { animation-delay: 0.18s; }
+  .slide.active > *:nth-child(3) { animation-delay: 0.31s; }
+  .slide.active > *:nth-child(4) { animation-delay: 0.44s; }
+  .slide.active > *:nth-child(5) { animation-delay: 0.57s; }
+  .slide.active > *:nth-child(6) { animation-delay: 0.70s; }
+  .slide.active > *:nth-child(7) { animation-delay: 0.83s; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .tap-zone {
+    position: absolute;
+    top: 60px; bottom: 0;
+    width: 35%;
+    z-index: 30;
+    cursor: pointer;
+  }
+  .tap-zone.left { left: 0; }
+  .tap-zone.right { right: 0; }
+
+  .footer-hint {
+    position: absolute;
+    bottom: 18px; left: 0; right: 0;
+    text-align: center;
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--ink-soft);
+    opacity: 0.6;
+    z-index: 20;
+    pointer-events: none;
+  }
+  .footer-hint .arrow {
+    display: inline-block;
+    animation: nudge 2s ease-in-out infinite;
+  }
+  @keyframes nudge {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(4px); }
+  }
+
+  .illu {
+    width: 100%;
+    max-width: 280px;
+    margin: 0 auto 18px;
+    display: block;
+  }
+  .illu.sm { max-width: 180px; }
+  .illu.lg { max-width: 320px; }
+  .illu svg { width: 100%; height: auto; display: block; }
+
+  .draw path, .draw line, .draw circle, .draw rect, .draw polygon, .draw polyline {
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: draw 1.6s 0.3s cubic-bezier(0.5, 0, 0.2, 1) forwards;
+  }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+
+  .pulse-dot { animation: pulseDot 1.8s ease-in-out infinite; }
+  @keyframes pulseDot {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.15); }
+  }
+
+  .cover {
+    background: var(--bg-deep);
+    color: var(--paper);
+  }
+  .cover h1 { color: var(--paper); }
+  .cover .eyebrow { color: var(--accent-soft); }
+  .cover p { color: rgba(251,247,239,0.7); }
+  .cover .footer-hint { color: rgba(251,247,239,0.5); }
+
+  .quiz-intro { text-align: center; }
+  .quiz-icon {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 24px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--serif);
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--paper);
+    animation: popIn 0.6s 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+  }
+  @keyframes popIn {
+    from { transform: scale(0); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .question-num {
+    font-family: var(--sans);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 14px;
+  }
+  .question {
+    font-family: var(--serif);
+    font-size: 22px;
+    line-height: 1.3;
+    font-weight: 600;
+    margin-bottom: 24px;
+    letter-spacing: -0.01em;
+  }
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option {
+    background: var(--paper);
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.4;
+    color: var(--ink);
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .option:active { transform: scale(0.98); }
+  .option .letter {
+    flex-shrink: 0;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    border: 1.5px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 1px;
+    transition: all 0.2s ease;
+  }
+  .option.correct {
+    background: rgba(46, 125, 79, 0.08);
+    border-color: var(--correct);
+    color: var(--correct);
+  }
+  .option.correct .letter {
+    background: var(--correct);
+    color: white;
+    border-color: var(--correct);
+  }
+  .option.wrong {
+    background: rgba(181, 52, 43, 0.06);
+    border-color: var(--wrong);
+    color: var(--wrong);
+  }
+  .option.wrong .letter {
+    background: var(--wrong);
+    color: white;
+    border-color: var(--wrong);
+  }
+  .option.disabled { pointer-events: none; opacity: 0.55; }
+
+  .feedback {
+    margin-top: 18px;
+    padding: 16px;
+    border-radius: 12px;
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.5;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.4s ease;
+  }
+  .feedback.show {
+    opacity: 1;
+    max-height: 400px;
+  }
+  .feedback.right {
+    background: rgba(46, 125, 79, 0.08);
+    color: var(--correct);
+    border: 1px solid rgba(46, 125, 79, 0.2);
+  }
+  .feedback.miss {
+    background: rgba(181, 52, 43, 0.06);
+    color: var(--ink);
+    border: 1px solid rgba(181, 52, 43, 0.2);
+  }
+  .feedback strong { font-weight: 700; }
+  .feedback .head {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 16px;
+    margin-bottom: 6px;
+    display: block;
+    font-weight: 600;
+  }
+
+  .end {
+    background: var(--bg-deep);
+    color: var(--paper);
+    text-align: center;
+  }
+  .end h2 { color: var(--paper); }
+  .end p { color: rgba(251,247,239,0.7); }
+  .end .score {
+    font-family: var(--serif);
+    font-size: 72px;
+    font-weight: 800;
+    color: var(--accent-soft);
+    line-height: 1;
+    margin: 20px 0;
+  }
+  .restart {
+    margin-top: 28px;
+    background: var(--accent);
+    color: var(--paper);
+    border: none;
+    padding: 14px 28px;
+    border-radius: 100px;
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .restart:active { transform: scale(0.96); }
+
+  .slide::-webkit-scrollbar { display: none; }
+  .slide { scrollbar-width: none; }
+
+  .card-soft {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px;
+  }
+  .stamp {
+    display: inline-block;
+    background: var(--accent);
+    color: var(--paper);
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 100px;
+  }
+  .stamp.dark {
+    background: var(--bg-deep);
+    color: var(--accent-soft);
+  }
+
+  .duo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .duo {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 10px;
+    text-align: center;
+  }
+  .duo svg { width: 48px; height: 48px; margin: 0 auto 8px; display: block; }
+  .duo .name {
+    font-family: var(--serif);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .duo .sub {
+    font-family: var(--sans);
+    font-size: 11px;
+    color: var(--ink-soft);
+    margin-top: 2px;
+    letter-spacing: 0.05em;
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="progress" id="progress"></div>
+  <div class="header">
+    <span>Aula 05</span>
+    <span id="counter">1 / 1</span>
+  </div>
+
+  <div class="slides" id="slides">
+
+    <!-- ============== 1 — CAPA ============== -->
+    <section class="slide cover active">
+      <div class="eyebrow">História · Aula 5</div>
+      <h1>Grécia e Roma. As duas civilizações que ainda vivem dentro de <em>você</em>.</h1>
+      <p style="margin-top: 16px;">Democracia, filosofia, república e direito. Tudo isso nasceu lá. E você usa hoje.</p>
+      <div class="illu" style="margin-top: 32px;">
+        <svg viewBox="0 0 260 140" class="draw" fill="none" stroke="#E8C77A" stroke-width="1.5">
+          <!-- coluna grega (esquerda) -->
+          <rect x="35" y="35" width="50" height="8"/>
+          <path d="M40 43 L40 100 M50 43 L50 100 M60 43 L60 100 M70 43 L70 100 M80 43 L80 100"/>
+          <rect x="32" y="100" width="56" height="8"/>
+          <rect x="28" y="108" width="64" height="6"/>
+          <!-- triângulo grego topo -->
+          <path d="M30 35 L60 18 L90 35"/>
+          <!-- arco romano (direita) -->
+          <path d="M170 110 L170 65 Q170 35 200 35 Q230 35 230 65 L230 110"/>
+          <path d="M165 110 L235 110"/>
+          <path d="M160 114 L240 114"/>
+          <!-- águia stilizada no topo -->
+          <path d="M200 28 L196 22 L200 18 L204 22 Z"/>
+        </svg>
+      </div>
+      <div class="footer-hint">toque na lateral pra avançar <span class="arrow">→</span></div>
+    </section>
+
+    <!-- ============== 2 ============== -->
+    <section class="slide">
+      <p class="big">Oi.</p>
+      <p style="margin-top: 18px;">Na aula passada, eu te mostrei a fórmula que fez vilarejo virar império.</p>
+      <p><strong>Escrita, exército e religião institucionalizada.</strong></p>
+      <p>Nasceu na Mesopotâmia, no Egito, na China. Funcionou. Funcionou tão bem que durou milhares de anos.</p>
+    </section>
+
+    <!-- ============== 3 ============== -->
+    <section class="slide">
+      <p>Mas hoje a gente vai falar de duas civilizações específicas.</p>
+      <p style="margin-top: 12px;">Duas que pegaram essa fórmula…</p>
+      <p class="big" style="margin-top: 14px;">…e fizeram uma coisa <em>diferente</em> com ela.</p>
+      <p style="margin-top: 14px;">Uma coisa que mudou o jogo de novo.</p>
+    </section>
+
+    <!-- ============== 4 ============== -->
+    <section class="slide">
+      <div class="eyebrow">As duas civilizações</div>
+      <div class="duo-grid">
+        <div class="duo">
+          <svg viewBox="0 0 48 48" fill="none" stroke="#B8862F" stroke-width="1.5">
+            <path d="M14 14 L34 14"/>
+            <path d="M16 14 L16 36 M22 14 L22 36 M28 14 L28 36 M34 14 L34 36"/>
+            <rect x="12" y="36" width="24" height="3"/>
+            <path d="M12 14 L24 8 L36 14"/>
+          </svg>
+          <div class="name">Grécia</div>
+          <div class="sub">pensou</div>
+        </div>
+        <div class="duo">
+          <svg viewBox="0 0 48 48" fill="none" stroke="#B8862F" stroke-width="1.5">
+            <path d="M14 38 L14 24 Q14 16 24 16 Q34 16 34 24 L34 38"/>
+            <path d="M10 38 L38 38"/>
+            <path d="M8 41 L40 41"/>
+          </svg>
+          <div class="name">Roma</div>
+          <div class="sub">construiu</div>
+        </div>
+      </div>
+      <p style="margin-top: 18px; font-size: 14px; color: var(--ink-soft); font-style: italic; text-align: center;">Bora destrinchar.</p>
+    </section>
+
+    <!-- ============== 5 ============== -->
+    <section class="slide">
+      <p>Eu vou te falar de cara por que elas merecem uma aula só.</p>
+      <p style="margin-top: 12px;"><strong>Não é por tamanho.</strong></p>
+      <p>O império romano foi grande, mas teve império maior.</p>
+      <p>A Grécia nem império era — eram cidadezinhas brigando entre si.</p>
+    </section>
+
+    <!-- ============== 6 ============== -->
+    <section class="slide">
+      <p class="big">É porque essas duas civilizações…</p>
+      <p style="margin-top: 14px;">…inventaram coisas que <strong>você usa, hoje, no seu dia a dia</strong>.</p>
+      <p style="margin-top: 8px; font-family: var(--serif); font-style: italic; font-size: 20px; color: var(--accent);">E nem sabe.</p>
+    </section>
+
+    <!-- ============== 7 — heranças ============== -->
+    <section class="slide">
+      <div class="eyebrow">Veio de lá</div>
+      <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 6px;">
+        <div style="padding: 12px 14px; background: var(--paper); border-radius: 10px; border-left: 3px solid var(--accent); font-size: 15px;">A palavra <strong>democracia</strong>.</div>
+        <div style="padding: 12px 14px; background: var(--paper); border-radius: 10px; border-left: 3px solid var(--accent); font-size: 15px;">A palavra <strong>república</strong>.</div>
+        <div style="padding: 12px 14px; background: var(--paper); border-radius: 10px; border-left: 3px solid var(--accent); font-size: 15px;">A ideia de <strong>lei escrita igual pra todos</strong>.</div>
+        <div style="padding: 12px 14px; background: var(--paper); border-radius: 10px; border-left: 3px solid var(--accent); font-size: 15px;">A ideia de <strong>questionar o rei, o padre, o costume</strong> — usando a sua cabeça.</div>
+      </div>
+      <p style="margin-top: 16px;">Tudo isso. <strong>Há mais de 2.000 anos.</strong></p>
+      <p style="margin-top: 6px; font-family: var(--serif); font-style: italic; color: var(--accent);">Pode chegar.</p>
+    </section>
+
+    <!-- ============== 8 — GRÉCIA abre ============== -->
+    <section class="slide">
+      <div class="number">01</div>
+      <div class="label" style="margin-top: 8px;">Primeira civilização</div>
+      <h2 style="margin-top: 12px;">Grécia.</h2>
+      <div class="illu" style="margin-top: 22px; max-width: 240px;">
+        <svg viewBox="0 0 240 120" class="draw" fill="none" stroke="#B8862F" stroke-width="1.5">
+          <!-- ilhas/montanhas -->
+          <path d="M10 90 L40 60 L65 90"/>
+          <path d="M70 95 L100 70 L130 95"/>
+          <path d="M135 90 L165 65 L195 90"/>
+          <path d="M200 95 L225 75 L240 95"/>
+          <!-- mar (linhas onduladas) -->
+          <path d="M5 100 Q20 105 35 100 T65 100 T95 100 T125 100 T155 100 T185 100 T215 100 T240 100"/>
+          <path d="M5 110 Q20 115 35 110 T65 110 T95 110 T125 110 T155 110 T185 110 T215 110 T240 110"/>
+          <!-- pequena coluna em cada -->
+          <rect x="38" y="55" width="4" height="6"/>
+          <rect x="98" y="65" width="4" height="6"/>
+          <rect x="163" y="60" width="4" height="6"/>
+        </svg>
+      </div>
+    </section>
+
+    <!-- ============== 9 ============== -->
+    <section class="slide">
+      <p>Primeiro, esquece a ideia de que a Grécia antiga era <strong>um país</strong>.</p>
+      <p class="big" style="margin-top: 14px;">Não era.</p>
+      <p style="margin-top: 14px;">Era um monte de cidadezinhas espalhadas por uma região cheia de <strong>montanha e mar</strong>.</p>
+      <p>Cada uma independente. Cada uma com seu jeito de governar.</p>
+    </section>
+
+    <!-- ============== 10 ============== -->
+    <section class="slide">
+      <div class="eyebrow">Cidades diferentes, mesma língua</div>
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 6px;">
+        <div class="card-soft" style="padding: 14px;">
+          <p style="font-family: var(--serif); font-size: 17px;"><strong>Atenas</strong> — de um jeito.</p>
+        </div>
+        <div class="card-soft" style="padding: 14px;">
+          <p style="font-family: var(--serif); font-size: 17px;"><strong>Esparta</strong> — de outro.</p>
+        </div>
+        <div class="card-soft" style="padding: 14px;">
+          <p style="font-family: var(--serif); font-size: 17px;"><strong>Tebas</strong> — de outro.</p>
+        </div>
+      </div>
+      <p style="margin-top: 16px;">Falavam a mesma língua. Adoravam os mesmos deuses.</p>
+      <p style="margin-top: 6px;">Mas politicamente, <strong>eram separados</strong>.</p>
+    </section>
+
+    <!-- ============== 11 — polis ============== -->
+    <section class="slide">
+      <p>Essas cidades, os gregos chamavam de…</p>
+      <p class="big" style="margin-top: 12px; color: var(--accent); font-style: italic;">Polis.</p>
+      <div class="illu sm" style="margin: 18px auto;">
+        <svg viewBox="0 0 160 80" class="draw" fill="none" stroke="#B8862F" stroke-width="1.5">
+          <!-- muralha circular -->
+          <circle cx="80" cy="45" r="32"/>
+          <!-- prédios dentro -->
+          <rect x="65" y="35" width="8" height="18"/>
+          <rect x="78" y="30" width="8" height="23"/>
+          <rect x="91" y="38" width="6" height="15"/>
+          <!-- templo no topo -->
+          <path d="M70 30 L80 22 L90 30"/>
+        </svg>
+      </div>
+      <p>É dessa palavra que vem <strong>política</strong>.</p>
+      <p style="margin-top: 8px;">Política era, literalmente, "<em>a coisa que a gente faz na polis</em>". A coisa da cidade.</p>
+    </section>
+
+    <!-- ============== 12 ============== -->
+    <section class="slide">
+      <p class="big">Agora presta atenção.</p>
+      <p style="margin-top: 16px;">Aqui tá uma das coisas mais loucas da história.</p>
+    </section>
+
+    <!-- ============== 13 — Atenas, ideia ============== -->
+    <section class="slide">
+      <div class="eyebrow">Atenas · Século V a.C.</div>
+      <p>Há mais ou menos <strong>2.450 anos</strong>, alguém em Atenas teve uma ideia que ninguém antes tinha tido.</p>
+      <div class="illu" style="margin: 18px auto; max-width: 240px;">
+        <svg viewBox="0 0 240 100" class="draw" fill="none" stroke="#B8862F" stroke-width="1.5">
+          <!-- praça com pessoinhas -->
+          <ellipse cx="120" cy="80" rx="100" ry="10"/>
+          <!-- figuras simplificadas -->
+          <circle cx="50" cy="55" r="5"/><path d="M50 60 L50 75 M45 65 L55 65"/>
+          <circle cx="75" cy="50" r="5"/><path d="M75 55 L75 75 M70 60 L80 60"/>
+          <circle cx="100" cy="55" r="5"/><path d="M100 60 L100 75 M95 65 L105 65"/>
+          <circle cx="125" cy="48" r="5"/><path d="M125 53 L125 75 M120 58 L130 58"/>
+          <circle cx="150" cy="55" r="5"/><path d="M150 60 L150 75 M145 65 L155 65"/>
+          <circle cx="175" cy="50" r="5"/><path d="M175 55 L175 75 M170 60 L180 60"/>
+          <circle cx="200" cy="55" r="5"/><path d="M200 60 L200 75 M195 65 L205 65"/>
+          <!-- balão de fala / pódio -->
+          <rect x="115" y="20" width="20" height="20"/>
+          <path d="M125 40 L125 48"/>
+        </svg>
+      </div>
+    </section>
+
+    <!-- ============== 14 ============== -->
+    <section class="slide">
+      <p>A ideia foi a seguinte.</p>
+      <p style="margin-top: 12px;">Em vez de o <strong>rei</strong> mandar.</p>
+      <p>Em vez de o <strong>sacerdote</strong> mandar.</p>
+      <p>Em vez de o <strong>mais rico</strong> mandar…</p>
+      <p class="big" style="margin-top: 14px;">…vamos fazer uma coisa diferente.</p>
+    </section>
+
+    <!-- ============== 15 ============== -->
+    <section class="slide">
+      <p class="quote">Vamos juntar todos os homens livres da cidade numa praça. E vamos deixar eles decidirem juntos.</p>
+      <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 8px;">
+        <div style="padding: 10px 14px; background: var(--paper); border-radius: 8px; font-size: 15px;">Quem quer falar, fala.</div>
+        <div style="padding: 10px 14px; background: var(--paper); border-radius: 8px; font-size: 15px;">Quem tem ideia, apresenta.</div>
+        <div style="padding: 10px 14px; background: var(--paper); border-radius: 8px; font-size: 15px;">Quem discorda, levanta a mão.</div>
+        <div style="padding: 10px 14px; background: var(--paper); border-radius: 8px; font-size: 15px;">No final, conta voto. Quem tem mais, ganha.</div>
+      </div>
+    </section>
+
+    <!-- ============== 16 ============== -->
+    <section class="slide">
+      <p>Hoje, isso parece <strong>óbvio</strong>.</p>
+      <p style="margin-top: 12px;">Mas naquele momento, foi uma <em>revolução total</em>.</p>
+      <p class="big" style="margin-top: 14px;">Pela primeira vez na história…</p>
+      <p style="margin-top: 12px;">o poder não vinha de <strong>Deus</strong>. Não vinha do <strong>sangue real</strong>. Não vinha da <strong>força do exército</strong>.</p>
+    </section>
+
+    <!-- ============== 17 ============== -->
+    <section class="slide">
+      <p class="big" style="text-align: center;">O poder vinha do <em>povo</em>.</p>
+      <div class="illu" style="margin: 22px auto; max-width: 220px;">
+        <svg viewBox="0 0 220 100" class="draw" fill="none" stroke="#B8862F" stroke-width="1.5">
+          <!-- várias mãozinhas -->
+          <circle cx="30" cy="70" r="6"/><path d="M30 64 L30 50"/>
+          <circle cx="55" cy="70" r="6"/><path d="M55 64 L55 45"/>
+          <circle cx="80" cy="70" r="6"/><path d="M80 64 L80 50"/>
+          <circle cx="105" cy="70" r="6"/><path d="M105 64 L105 42"/>
+          <circle cx="130" cy="70" r="6"/><path d="M130 64 L130 50"/>
+          <circle cx="155" cy="70" r="6"/><path d="M155 64 L155 45"/>
+          <circle cx="180" cy="70" r="6"/><path d="M180 64 L180 50"/>
+          <!-- coroa quebrada acima -->
+          <path d="M95 25 L100 18 L105 25 L110 18 L115 25 L120 18 L125 25" stroke-dasharray="2 3"/>
+        </svg>
+      </div>
+      <p>Da soma de cabeças comuns, decidindo juntas.</p>
+    </section>
+
+    <!-- ============== 18 — etimologia ============== -->
+    <section class="slide">
+      <div class="eyebrow">Os gregos chamaram de</div>
+      <p class="big" style="font-style: italic; color: var(--accent);">demokratía.</p>
+      <div style="margin-top: 18px; display: flex; flex-direction: column; gap: 10px;">
+        <div class="card-soft">
+          <div class="label" style="margin-bottom: 4px;">Demos</div>
+          <p style="font-family: var(--serif); font-size: 18px;">povo.</p>
+        </div>
+        <div class="card-soft">
+          <div class="label" style="margin-bottom: 4px;">Kratos</div>
+          <p style="font-family: var(--serif); font-size: 18px;">poder.</p>
+        </div>
+        <div class="card-soft" style="border-color: var(--accent);">
+          <p style="font-family: var(--serif); font-size: 20px; font-style: italic; color: var(--accent);">Poder do povo.</p>
+        </div>
+      </div>
+      <p class="big" style="margin-top: 18px; text-align: center;">Democracia.</p>
+    </section>
+
+    <!-- ============== 19 — frear ============== -->
+    <section class="slide">
+      <p class="big">Mas calma.</p>
+      <p style="margin-top: 14px;">Antes de você ficar todo emocionado, deixa eu te frear.</p>
+      <p style="margin-top: 14px;">A democracia ateniense <strong>não era essa maravilha</strong> que muita gente pinta.</p>
+    </section>
+
+    <!-- ============== 20 — quem votava ============== -->
+    <section class="slide">
+      <div class="eyebrow">Quem podia votar em Atenas?</div>
+      <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 6px;">
+        <div style="padding: 10px 14px; background: var(--paper); border-radius: 8px; font-size: 15px;">Só <strong>homem</strong>.</div>
+        <div style="padding: 10px 14px; background: var(--paper); border-radius: 8px; font-size: 15px;">Só <strong>adulto</strong>.</div>
+        <div style="padding: 10px 14px; background: var(--paper); border-radius: 8px; font-size: 15px;">Só nascido em Atenas, <strong>de pai e mãe atenienses</strong>.</div>
+      </div>
+      <p style="margin-top: 14px;">Davam mais ou menos <strong>30 a 40 mil pessoas</strong>.</p>
+    </section>
+
+    <!-- ============== 21 — proporção ============== -->
+    <section class="slide">
+      <p>E a cidade tinha quanta gente no total?</p>
+      <div style="text-align: center; margin: 22px 0;">
+        <div class="number" style="font-size: 64px;">300 mil</div>
+      </div>
+      <p>Quem ficava de fora?</p>
+      <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 6px;">
+        <div style="padding: 10px 14px; background: var(--paper); border-radius: 8px; font-size: 15px;">Mulher não votava.</div>
+        <div style="padding: 10px 14px; background: var(--paper); border-radius: 8px; font-size: 15px;">Estrangeiro não votava.</div>
+        <div style="padding: 10px 14px; background: var(--paper); border-radius: 8px; font-size: 15px;">Escravo (1/3 da população) não votava.</div>
+      </div>
+    </section>
+
+    <!-- ============== 22 ============== -->
+    <section class="slide">
+      <p>Na prática:</p>
+      <p class="big" style="margin-top: 14px;">~<strong>10%</strong> da população decidia pelos outros <strong>90%</strong>.</p>
+      <p style="margin-top: 14px;">Era democracia. Mas era uma democracia <em>bem restrita</em>.</p>
+    </section>
+
+    <!-- ============== 23 — mesmo assim, salto ============== -->
+    <section class="slide">
+      <p class="big">Mesmo assim, foi um salto gigante.</p>
+      <p style="margin-top: 16px;">Porque a <strong>ideia</strong> ficou.</p>
+      <p style="margin-top: 12px;">A ideia de que o poder pode vir <strong>de baixo pra cima</strong> — e não só de cima pra baixo.</p>
+    </section>
+
+    <!-- ============== 24 ============== -->
+    <section class="slide">
+      <p>Essa ideia ninguém mais conseguiu apagar.</p>
+      <p style="margin-top: 12px;">Ficou rondando a cabeça da humanidade por <strong>2.500 anos</strong>.</p>
+      <p>Ressuscitou, com força, na época moderna.</p>
+      <p class="big" style="margin-top: 14px; color: var(--accent);">E é a ideia que, hoje, te dá o direito de votar pra presidente.</p>
+    </section>
+
+    <!-- ============== 25 ============== -->
+    <section class="slide">
+      <p>Você votou na última eleição?</p>
+      <p class="big" style="margin-top: 14px;">Agradece um grego morto há 25 séculos.</p>
+      <p style="margin-top: 12px; font-family: var(--serif); font-style: italic; color: var(--accent);">Sério.</p>
+    </section>
+
+    <!-- ============== 26 — segunda invenção grega ============== -->
+    <section class="slide">
+      <p>E não foi só democracia.</p>
+      <p style="margin-top: 14px;">A Grécia inventou outra coisa.</p>
+      <p class="big" style="margin-top: 14px;">Talvez ainda mais importante.</p>
+    </section>
+
+    <!-- ============== 27 — filosofia ============== -->
+    <section class="slide">
+      <div class="eyebrow">Segunda invenção grega</div>
+      <h2>A <em>filosofia</em>.</h2>
+      <div class="illu" style="margin-top: 22px; max-width: 220px;">
+        <svg viewBox="0 0 220 120" class="draw" fill="none" stroke="#B8862F" stroke-width="1.5">
+          <!-- cabeça pensando -->
+          <circle cx="80" cy="60" r="28"/>
+          <!-- olho -->
+          <circle cx="88" cy="55" r="2" fill="#B8862F"/>
+          <!-- barba -->
+          <path d="M70 80 Q80 95 90 80"/>
+          <!-- balões de pensamento -->
+          <circle cx="135" cy="50" r="4"/>
+          <circle cx="150" cy="40" r="6"/>
+          <circle cx="172" cy="28" r="9"/>
+          <text x="167" y="33" font-family="Georgia" font-size="12" fill="#B8862F" font-style="italic">?</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- ============== 28 ============== -->
+    <section class="slide">
+      <p>Antes dos gregos, quando alguém perguntava…</p>
+      <div style="margin-top: 14px; display: flex; flex-direction: column; gap: 10px;">
+        <div class="card-soft">
+          <p style="font-family: var(--serif); font-style: italic; font-size: 16px;">"Por que chove?"</p>
+          <p style="font-size: 14px; color: var(--ink-soft); margin-top: 4px;">— Porque o deus da chuva quis.</p>
+        </div>
+        <div class="card-soft">
+          <p style="font-family: var(--serif); font-style: italic; font-size: 16px;">"Por que o sol nasce?"</p>
+          <p style="font-size: 14px; color: var(--ink-soft); margin-top: 4px;">— Os deuses estão movendo.</p>
+        </div>
+        <div class="card-soft">
+          <p style="font-family: var(--serif); font-style: italic; font-size: 16px;">"Por que a gente morre?"</p>
+          <p style="font-size: 14px; color: var(--ink-soft); margin-top: 4px;">— Os deuses decidiram.</p>
+        </div>
+      </div>
+      <p class="big" style="margin-top: 16px;">Tudo era explicado por deuses. Tudo.</p>
+    </section>
+
+    <!-- ============== 29 ============== -->
+    <section class="slide">
+      <p>Mas em algumas dessas cidadezinhas gregas…</p>
+      <p style="margin-top: 12px;">uns caras estranhos começaram a fazer uma coisa diferente.</p>
+      <p class="big" style="margin-top: 14px;">Eles começaram a perguntar <em>por quê</em>…</p>
+      <p style="margin-top: 8px; font-family: var(--serif); font-style: italic; color: var(--accent); font-size: 20px;">…sem aceitar deus como resposta.</p>
+    </section>
+
+    <!-- ============== 30 ============== -->
+    <section class="slide">
+      <div class="eyebrow">As novas perguntas</div>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <div style="padding: 14px; background: var(--paper); border-radius: 12px; border-left: 3px solid var(--accent);">
+          <p style="font-family: var(--serif); font-size: 16px; font-style: italic;">Por que chove? Será que tem motivo natural?</p>
+        </div>
+        <div style="padding: 14px; background: var(--paper); border-radius: 12px; border-left: 3px solid var(--accent);">
+          <p style="font-family: var(--serif); font-size: 16px; font-style: italic;">Dá pra explicar por causa e efeito, sem precisar de deus?</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== 31 — etimologia filosofia ============== -->
+    <section class="slide">
+      <p>Esses caras, a gente chama de…</p>
+      <p class="big" style="margin-top: 12px; font-style: italic; color: var(--accent);">filósofos.</p>
+      <div style="margin-top: 18px; display: flex; flex-direction: column; gap: 10px;">
+        <div class="card-soft">
+          <div class="label" style="margin-bottom: 4px;">Filo</div>
+          <p style="font-family: var(--serif); font-size: 18px;">amor.</p>
+        </div>
+        <div class="card-soft">
+          <div class="label" style="margin-bottom: 4px;">Sofia</div>
+          <p style="font-family: var(--serif); font-size: 18px;">sabedoria.</p>
+        </div>
+        <div class="card-soft" style="border-color: var(--accent);">
+          <p style="font-family: var(--serif); font-size: 20px; font-style: italic; color: var(--accent);">Amantes da sabedoria.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== 32 — os famosos ============== -->
+    <section class="slide">
+      <p>Os mais famosos você já ouviu falar.</p>
+      <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 14px; padding: 12px; background: var(--paper); border-radius: 10px;">
+          <span style="font-family: var(--serif); font-weight: 800; color: var(--accent); font-size: 20px;">○</span>
+          <span style="font-family: var(--serif); font-size: 18px;">Sócrates</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 14px; padding: 12px; background: var(--paper); border-radius: 10px;">
+          <span style="font-family: var(--serif); font-weight: 800; color: var(--accent); font-size: 20px;">○</span>
+          <span style="font-family: var(--serif); font-size: 18px;">Platão</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 14px; padding: 12px; background: var(--paper); border-radius: 10px;">
+          <span style="font-family: var(--serif); font-weight: 800; color: var(--accent); font-size: 20px;">○</span>
+          <span style="font-family: var(--serif); font-size: 18px;">Aristóteles</span>
+        </div>
+      </div>
+      <p style="margin-top: 14px;">Mas teve <strong>dezenas, centenas</strong>.</p>
+    </section>
+
+    <!-- ============== 33 — o que inventaram ============== -->
+    <section class="slide">
+      <p>E eles inventaram uma coisa que, até hoje, é o motor da:</p>
+      <div style="margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px;">
+        <span class="stamp">ciência</span>
+        <span class="stamp">medicina</span>
+        <span class="stamp">tecnologia</span>
+        <span class="stamp">de tudo</span>
+      </div>
+      <p class="big" style="margin-top: 18px;">A ideia de que o ser humano pode usar a <em>própria razão</em> pra entender o mundo.</p>
+    </section>
+
+    <!-- ============== 34 ============== -->
+    <section class="slide">
+      <p>Sem precisar de revelação divina.</p>
+      <p>Sem precisar do que o livro sagrado disse.</p>
+      <p class="big" style="margin-top: 14px;">Só usando a cabeça.</p>
+      <p>A observação. O argumento.</p>
+    </section>
+
+    <!-- ============== 35 — o tamanho disso ============== -->
+    <section class="slide">
+      <div class="eyebrow">Pensa o tamanho disso</div>
+      <div class="illu" style="margin-top: 12px; max-width: 260px;">
+        <svg viewBox="0 0 260 100" class="draw" fill="none" stroke="#B8862F" stroke-width="1.5">
+          <!-- antes: livro fechado com aura -->
+          <rect x="20" y="35" width="40" height="50" rx="2"/>
+          <path d="M40 35 L40 85"/>
+          <path d="M30 25 L30 30 M40 22 L40 28 M50 25 L50 30" stroke-dasharray="2 2"/>
+          <!-- seta -->
+          <path d="M75 60 L130 60" stroke-dasharray="3 3"/>
+          <path d="M123 55 L130 60 L123 65"/>
+          <!-- depois: cérebro/cabeças -->
+          <circle cx="160" cy="60" r="14"/>
+          <circle cx="195" cy="60" r="14"/>
+          <circle cx="230" cy="60" r="14"/>
+          <path d="M152 56 Q160 50 168 56 M187 56 Q195 50 203 56 M222 56 Q230 50 238 56"/>
+        </svg>
+      </div>
+      <p>Antes dos gregos: conhecimento era coisa de <strong>sacerdote</strong>, que recebia de Deus.</p>
+      <p style="margin-top: 10px;">Depois dos gregos: conhecimento virou coisa de <strong>qualquer um</strong> que tivesse cabeça e disposição pra pensar.</p>
+    </section>
+
+    <!-- ============== 36 ============== -->
+    <section class="slide">
+      <p>Foi essa virada que, 2.000 anos depois…</p>
+      <p class="big" style="margin-top: 14px;">…fez nascer a ciência moderna.</p>
+      <div style="margin-top: 14px; display: flex; flex-direction: column; gap: 6px;">
+        <div style="padding: 10px 14px; background: var(--paper); border-radius: 8px; font-size: 15px;">O remédio que cura sua dor de cabeça.</div>
+        <div style="padding: 10px 14px; background: var(--paper); border-radius: 8px; font-size: 15px;">O avião que voa.</div>
+        <div style="padding: 10px 14px; background: var(--paper); border-radius: 8px; font-size: 15px;">A internet que você usa.</div>
+      </div>
+    </section>
+
+    <!-- ============== 37 ============== -->
+    <section class="slide">
+      <p class="quote">Tudo isso vem, em última instância, daquela tarde em Atenas. Quando um cara chamado Sócrates ficou parando gente na rua, perguntando coisa que ninguém queria responder.</p>
+    </section>
+
+    <!-- ============== 38 — por que Grécia caiu ============== -->
+    <section class="slide">
+      <p>Tá. Beleza.</p>
+      <p style="margin-top: 12px;">Mas se a Grécia foi tão genial…</p>
+      <p class="big" style="margin-top: 12px;">por que a Grécia não dominou o mundo?</p>
+    </section>
+
+    <!-- ============== 39 ============== -->
+    <section class="slide">
+      <p>Porque a Grécia tinha <strong>um problema</strong>.</p>
+      <p style="margin-top: 12px;">Aquelas cidades viviam brigando entre si.</p>
+      <div class="illu" style="margin: 16px auto; max-width: 220px;">
+        <svg viewBox="0 0 220 80" class="draw" fill="none" stroke="#B8862F" stroke-width="1.5">
+          <circle cx="40" cy="40" r="14"/>
+          <circle cx="110" cy="40" r="14"/>
+          <circle cx="180" cy="40" r="14"/>
+          <!-- raios entre eles -->
+          <path d="M55 40 L95 40" stroke-dasharray="3 3"/>
+          <path d="M125 40 L165 40" stroke-dasharray="3 3"/>
+          <path d="M55 30 Q110 10 165 30" stroke-dasharray="3 3"/>
+          <text x="73" y="45" font-family="Georgia" font-size="10" fill="#B8862F">⚔</text>
+          <text x="143" y="45" font-family="Georgia" font-size="10" fill="#B8862F">⚔</text>
+        </svg>
+      </div>
+      <p>Uma queria mandar na outra. Todo mundo se odiava.</p>
+      <p style="margin-top: 8px;">Faziam guerra o tempo inteiro.</p>
+    </section>
+
+    <!-- ============== 40 ============== -->
+    <section class="slide">
+      <p>Quando finalmente apareceu um <strong>inimigo de fora</strong> forte…</p>
+      <p class="big" style="margin-top: 14px;">…eles não conseguiram se unir direito.</p>
+      <p style="margin-top: 14px;">Foram engolidos.</p>
+      <p style="margin-top: 14px;">Primeiro pela <strong>Macedônia</strong>, com Alexandre o Grande.</p>
+      <p style="margin-top: 8px;">Depois, por quem a gente vai falar agora.</p>
+    </section>
+
+    <!-- ============== 41 — ROMA abre ============== -->
+    <section class="slide">
+      <div class="number">02</div>
+      <div class="label" style="margin-top: 8px;">Segunda civilização</div>
+      <h2 style="margin-top: 12px;">Roma.</h2>
+      <div class="illu" style="margin-top: 22px; max-width: 240px;">
+        <svg viewBox="0 0 240 120" class="draw" fill="none" stroke="#B8862F" stroke-width="1.5">
+          <!-- aqueduto -->
+          <path d="M20 90 L20 60 Q20 50 35 50 Q50 50 50 60 L50 90"/>
+          <path d="M50 90 L50 60 Q50 50 65 50 Q80 50 80 60 L80 90"/>
+          <path d="M80 90 L80 60 Q80 50 95 50 Q110 50 110 60 L110 90"/>
+          <path d="M110 90 L110 60 Q110 50 125 50 Q140 50 140 60 L140 90"/>
+          <path d="M140 90 L140 60 Q140 50 155 50 Q170 50 170 60 L170 90"/>
+          <path d="M170 90 L170 60 Q170 50 185 50 Q200 50 200 60 L200 90"/>
+          <path d="M200 90 L200 60 Q200 50 215 50 Q230 50 230 60 L230 90"/>
+          <!-- topo do aqueduto -->
+          <path d="M15 50 L235 50"/>
+          <path d="M15 45 L235 45"/>
+          <path d="M15 95 L235 95"/>
+        </svg>
+      </div>
+    </section>
+
+    <!-- ============== 42 — contraste ============== -->
+    <section class="slide">
+      <p>Roma é uma história <strong>totalmente diferente</strong> da Grécia.</p>
+      <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 10px;">
+        <div class="card-soft">
+          <div class="label" style="margin-bottom: 4px;">Gregos</div>
+          <p style="font-family: var(--serif); font-size: 17px;">Intelectuais. Filósofos. Artistas.</p>
+        </div>
+        <div class="card-soft">
+          <div class="label" style="margin-bottom: 4px;">Romanos</div>
+          <p style="font-family: var(--serif); font-size: 17px;">Engenheiros. Soldados. Administradores.</p>
+        </div>
+      </div>
+      <p class="big" style="margin-top: 16px;">Os gregos pensavam o mundo. Os romanos <em>construíam</em> o mundo.</p>
+    </section>
+
+    <!-- ============== 43 — origem ============== -->
+    <section class="slide">
+      <div class="eyebrow">753 a.C.</div>
+      <p>Roma, segundo a tradição, foi fundada em <strong>753 antes de Cristo</strong>.</p>
+      <p style="margin-top: 12px;">Como cidadezinha pequena na Itália. Do lado do <strong>rio Tibre</strong>.</p>
+      <div class="illu sm" style="margin: 16px auto;">
+        <svg viewBox="0 0 160 70" class="draw" fill="none" stroke="#B8862F" stroke-width="1.5">
+          <!-- rio -->
+          <path d="M0 50 Q40 45 80 50 T160 50"/>
+          <path d="M0 58 Q40 53 80 58 T160 58"/>
+          <!-- vilarejo -->
+          <path d="M55 35 L65 22 L75 35"/>
+          <rect x="58" y="35" width="14" height="12"/>
+          <path d="M85 38 L93 28 L101 38"/>
+          <rect x="87" y="38" width="12" height="9"/>
+        </svg>
+      </div>
+      <p>Por uns 250 anos, foi uma <strong>monarquia</strong>. Tinha rei. Como qualquer cidade da época.</p>
+    </section>
+
+    <!-- ============== 44 — revolta ============== -->
+    <section class="slide">
+      <div class="eyebrow">509 a.C. · Aconteceu uma coisa</div>
+      <p>O último rei de Roma, <strong>Tarquínio</strong>, era tão tirano, tão abusado…</p>
+      <p style="margin-top: 12px;">…que os cidadãos romanos se revoltaram.</p>
+      <p class="big" style="margin-top: 14px;">Expulsaram o rei.</p>
+      <p style="margin-top: 12px;">E juraram, todos juntos: <strong>nunca mais</strong> aceitar um rei em Roma.</p>
+    </section>
+
+    <!-- ============== 45 — res publica ============== -->
+    <section class="slide">
+      <p>E criaram um sistema novo.</p>
+      <p style="margin-top: 12px;">Que eles chamaram de…</p>
+      <p class="big" style="margin-top: 12px; color: var(--accent); font-style: italic;">res publica.</p>
+      <div style="margin-top: 16px; padding: 16px; background: var(--paper); border-radius: 12px; border-left: 3px solid var(--accent);">
+        <p style="font-size: 15px;">Em latim: "<strong>coisa pública</strong>". Coisa de todos.</p>
+      </div>
+      <p class="big" style="margin-top: 16px; text-align: center;">República.</p>
+    </section>
+
+    <!-- ============== 46 — como funcionava ============== -->
+    <section class="slide">
+      <div class="eyebrow">A república romana</div>
+      <div class="illu" style="margin-top: 8px; max-width: 240px;">
+        <svg viewBox="0 0 240 120" class="draw" fill="none" stroke="#B8862F" stroke-width="1.5">
+          <!-- pirâmide invertida de poder -->
+          <!-- 2 cônsules no topo -->
+          <circle cx="100" cy="20" r="8"/>
+          <circle cx="140" cy="20" r="8"/>
+          <text x="80" y="42" font-family="Georgia" font-size="9" fill="#4A4640">2 cônsules</text>
+          <!-- senado meio -->
+          <rect x="60" y="55" width="120" height="18" rx="2"/>
+          <text x="98" y="67" font-family="Georgia" font-size="9" fill="#4A4640">Senado · 300</text>
+          <!-- assembleia base -->
+          <rect x="20" y="90" width="200" height="18" rx="2"/>
+          <text x="78" y="102" font-family="Georgia" font-size="9" fill="#4A4640">Assembleias do povo</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- ============== 47 ============== -->
+    <section class="slide">
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <div class="card-soft">
+          <div class="label" style="margin-bottom: 4px;">No topo</div>
+          <p style="font-family: var(--serif); font-size: 16px;"><strong>2 cônsules</strong>. Eleitos. Mandato de <em>1 ano só</em>. No ano seguinte, outros dois.</p>
+          <p style="font-size: 13px; color: var(--ink-soft); margin-top: 4px; font-style: italic;">Pra ninguém ficar com poder demais por tempo demais.</p>
+        </div>
+        <div class="card-soft">
+          <div class="label" style="margin-bottom: 4px;">Em cima dos cônsules</div>
+          <p style="font-family: var(--serif); font-size: 16px;"><strong>Senado</strong>. ~300 senadores. Aconselhavam, controlavam o dinheiro, decidiam guerra e paz.</p>
+        </div>
+        <div class="card-soft">
+          <div class="label" style="margin-bottom: 4px;">Embaixo</div>
+          <p style="font-family: var(--serif); font-size: 16px;"><strong>Assembleias do povo</strong>. Votavam as leis.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== 48 — olha que coisa ============== -->
+    <section class="slide">
+      <p class="big">Olha que coisa.</p>
+      <div style="margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px;">
+        <span class="stamp">poderes separados</span>
+        <span class="stamp">mandato com prazo</span>
+        <span class="stamp">eleição</span>
+        <span class="stamp">lei escrita</span>
+      </div>
+      <p style="margin-top: 18px;">Tudo isso, há <strong>2.500 anos</strong>.</p>
+    </section>
+
+    <!-- ============== 49 — quem se inspirou ============== -->
+    <section class="slide">
+      <div class="eyebrow">Quem se inspirou em Roma?</div>
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 6px;">
+        <div class="card-soft">
+          <p style="font-family: var(--serif); font-size: 16px;"><strong>EUA</strong>, em 1776.</p>
+          <p style="font-size: 13px; color: var(--ink-soft); margin-top: 4px;">Fundadores se inspiraram em Roma.</p>
+        </div>
+        <div class="card-soft">
+          <p style="font-family: var(--serif); font-size: 16px;"><strong>Brasil</strong>, em 1889.</p>
+          <p style="font-size: 13px; color: var(--ink-soft); margin-top: 4px;">A palavra <em>república</em> veio de Roma.</p>
+        </div>
+        <div class="card-soft">
+          <p style="font-family: var(--serif); font-size: 16px;"><strong>Os 3 poderes</strong> da Constituição.</p>
+          <p style="font-size: 13px; color: var(--ink-soft); margin-top: 4px;">Executivo, legislativo, judiciário. Veio de Roma.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== 50 ============== -->
+    <section class="slide">
+      <p class="big">Roma inventou um sistema de governar…</p>
+      <p style="margin-top: 14px;">…que, com mudanças, é praticamente o sistema que <strong>você vive hoje</strong>.</p>
+    </section>
+
+    <!-- ============== 51 — direito ============== -->
+    <section class="slide">
+      <p>Mas Roma fez mais.</p>
+      <p style="margin-top: 12px;">Fez uma coisa que talvez seja a maior contribuição dela pra história.</p>
+      <p class="big" style="margin-top: 14px;">Roma inventou o <em>direito</em>.</p>
+      <div class="illu sm" style="margin: 18px auto;">
+        <svg viewBox="0 0 160 80" class="draw" fill="none" stroke="#B8862F" stroke-width="1.5">
+          <!-- balança -->
+          <path d="M80 10 L80 60"/>
+          <path d="M50 25 L110 25"/>
+          <path d="M50 25 L40 45 L60 45 Z"/>
+          <path d="M110 25 L100 45 L120 45 Z"/>
+          <path d="M65 60 L95 60"/>
+          <path d="M60 65 L100 65"/>
+        </svg>
+      </div>
+    </section>
+
+    <!-- ============== 52 — atenção palavra ============== -->
+    <section class="slide">
+      <div class="eyebrow">Atenção</div>
+      <p>A palavra <strong>direito</strong> aqui é bem específica.</p>
+      <p style="margin-top: 12px;"><strong>Não é só ter lei escrita.</strong></p>
+      <p style="margin-top: 12px;">Os egípcios tinham. Os mesopotâmios tinham.</p>
+      <p style="margin-top: 8px;">O famoso <em>Código de Hamurábi</em> (Mesopotâmia, 1.800 a.C.) já existia.</p>
+    </section>
+
+    <!-- ============== 53 ============== -->
+    <section class="slide">
+      <p class="big">O que Roma fez foi diferente.</p>
+      <p style="margin-top: 14px;">Roma transformou o direito numa <strong>ciência</strong>.</p>
+      <p style="margin-top: 12px;">Estudada, debatida, refinada, durante séculos.</p>
+    </section>
+
+    <!-- ============== 54 — o que Roma criou ============== -->
+    <section class="slide">
+      <div class="eyebrow">Roma criou</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px;">
+        <div style="padding: 10px; background: var(--paper); border-radius: 8px; font-size: 14px; text-align: center;">advogado</div>
+        <div style="padding: 10px; background: var(--paper); border-radius: 8px; font-size: 14px; text-align: center;">juiz</div>
+        <div style="padding: 10px; background: var(--paper); border-radius: 8px; font-size: 14px; text-align: center;">processo</div>
+        <div style="padding: 10px; background: var(--paper); border-radius: 8px; font-size: 14px; text-align: center;">contrato</div>
+        <div style="padding: 10px; background: var(--paper); border-radius: 8px; font-size: 14px; text-align: center;">propriedade</div>
+        <div style="padding: 10px; background: var(--paper); border-radius: 8px; font-size: 14px; text-align: center;">herança</div>
+        <div style="padding: 10px; background: var(--paper); border-radius: 8px; font-size: 14px; text-align: center; grid-column: span 2;">casamento civil</div>
+      </div>
+      <p style="margin-top: 14px;">Tudo do jeito que a gente conhece hoje.</p>
+    </section>
+
+    <!-- ============== 55 ============== -->
+    <section class="slide">
+      <div class="eyebrow">No seu dia a dia</div>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <div style="padding: 14px; background: var(--paper); border-radius: 12px; border-left: 3px solid var(--accent);">
+          <p style="font-size: 15px;">Assina contrato de aluguel? <strong>Direito romano.</strong></p>
+        </div>
+        <div style="padding: 14px; background: var(--paper); border-radius: 12px; border-left: 3px solid var(--accent);">
+          <p style="font-size: 15px;">Alguém morre e os filhos herdam? <strong>Direito romano.</strong></p>
+        </div>
+        <div style="padding: 14px; background: var(--paper); border-radius: 12px; border-left: 3px solid var(--accent);">
+          <p style="font-size: 15px;">Compra com defeito e tem direito a devolver? <strong>Direito romano.</strong></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== 56 ============== -->
+    <section class="slide">
+      <p>Os romanos estudaram isso por <strong>mil anos</strong>.</p>
+      <p style="margin-top: 8px;">Refinaram. Codificaram.</p>
+      <p style="margin-top: 12px;">Quando o império caiu, esse conhecimento <strong>ficou</strong>.</p>
+      <p>Foi copiado, traduzido, adaptado.</p>
+      <p class="big" style="margin-top: 14px;">E virou a base do sistema jurídico de quase todo o ocidente.</p>
+      <p style="margin-top: 6px; font-family: var(--serif); font-style: italic; color: var(--accent);">Inclusive o Brasil.</p>
+    </section>
+
+    <!-- ============== 57 — fim da república ============== -->
+    <section class="slide">
+      <p class="big">Mas tem uma coisa.</p>
+      <p style="margin-top: 16px;">Roma <strong>não foi sempre república</strong>.</p>
+      <p style="margin-top: 12px;">A república durou uns <strong>500 anos</strong>. Funcionou bem.</p>
+      <p>Mas depois começou a ranger.</p>
+    </section>
+
+    <!-- ============== 58 ============== -->
+    <section class="slide">
+      <p>Com tanta conquista, tanta riqueza entrando, tanta desigualdade crescendo…</p>
+      <p style="margin-top: 12px;">Os generais que voltavam das guerras estavam:</p>
+      <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 6px;">
+        <div style="padding: 10px 14px; background: var(--paper); border-radius: 8px; font-size: 15px;">ricos demais</div>
+        <div style="padding: 10px 14px; background: var(--paper); border-radius: 8px; font-size: 15px;">populares demais</div>
+        <div style="padding: 10px 14px; background: var(--paper); border-radius: 8px; font-size: 15px;">poderosos demais</div>
+      </div>
+      <p style="margin-top: 14px;">Cada um queria mandar mais que o outro. Começaram as <strong>guerras civis</strong>.</p>
+    </section>
+
+    <!-- ============== 59 — César ============== -->
+    <section class="slide">
+      <div class="eyebrow">44 a.C.</div>
+      <p>Um cara chamado <strong>Júlio César</strong> foi assassinado, no senado, por gente que tentou salvar a república.</p>
+      <div class="illu sm" style="margin: 16px auto;">
+        <svg viewBox="0 0 160 80" class="draw" fill="none" stroke="#B8862F" stroke-width="1.5">
+          <!-- vulto e adagas -->
+          <circle cx="80" cy="35" r="10"/>
+          <path d="M80 45 L80 65"/>
+          <path d="M70 50 L60 60 M65 53 L55 63"/>
+          <path d="M90 50 L100 60 M95 53 L105 63"/>
+          <path d="M75 30 L72 25 M85 30 L88 25"/>
+        </svg>
+      </div>
+      <p class="big">Não conseguiu.</p>
+      <p style="margin-top: 12px;">O sobrinho dele, <strong>Augusto</strong>, virou o primeiro imperador.</p>
+      <p style="margin-top: 8px;">E a república acabou.</p>
+    </section>
+
+    <!-- ============== 60 ============== -->
+    <section class="slide">
+      <p class="big">Roma virou império.</p>
+      <p style="margin-top: 14px;">E como império, durou mais <strong>500 anos</strong>.</p>
+    </section>
+
+    <!-- ============== 61 — fase do império ============== -->
+    <section class="slide">
+      <p>Foi nessa fase que Roma virou aquela coisa que a gente estuda na escola.</p>
+      <div style="margin-top: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+        <div style="padding: 10px; background: var(--paper); border-radius: 8px; font-size: 14px; text-align: center;">Pão e circo</div>
+        <div style="padding: 10px; background: var(--paper); border-radius: 8px; font-size: 14px; text-align: center;">Coliseu</div>
+        <div style="padding: 10px; background: var(--paper); border-radius: 8px; font-size: 14px; text-align: center;">Estradas</div>
+        <div style="padding: 10px; background: var(--paper); border-radius: 8px; font-size: 14px; text-align: center;">Aquedutos</div>
+        <div style="padding: 10px; background: var(--paper); border-radius: 8px; font-size: 14px; text-align: center; grid-column: span 2;">Latim como língua oficial</div>
+      </div>
+    </section>
+
+    <!-- ============== 62 — extensão ============== -->
+    <section class="slide">
+      <div class="eyebrow">Roma dominava</div>
+      <p>Do <strong>oceano Atlântico</strong> ao <strong>Oriente Médio</strong>.</p>
+      <p>Do <strong>norte da África</strong> à <strong>Inglaterra</strong>.</p>
+      <div style="text-align: center; margin: 22px 0;">
+        <div class="number" style="font-size: 60px;">60 mi</div>
+        <p style="font-size: 13px; color: var(--ink-soft); margin-top: 4px; letter-spacing: 0.1em;">de pessoas embaixo do mesmo governo</p>
+      </div>
+    </section>
+
+    <!-- ============== 63 ============== -->
+    <section class="slide">
+      <p class="quote">Roma foi, talvez, o império mais bem sucedido da história ocidental. Não pelo tamanho. Pela duração e pelo legado.</p>
+      <p style="margin-top: 16px;">Quase tudo que a Europa virou depois — e tudo que a América virou depois da Europa — é, em alguma medida, uma <strong>continuação</strong> do que Roma começou.</p>
+    </section>
+
+    <!-- ============== 64 — RESUMO ============== -->
+    <section class="slide">
+      <div class="eyebrow">Resumindo</div>
+      <h2>O que cada uma te deu.</h2>
+      <div style="margin-top: 14px; display: flex; flex-direction: column; gap: 10px;">
+        <div style="padding: 14px; background: var(--paper); border-radius: 12px; border-left: 3px solid var(--accent);">
+          <div class="label" style="margin-bottom: 4px;">Grécia · 1</div>
+          <p style="font-family: var(--serif); font-size: 17px;"><strong>Democracia</strong> — o poder pode vir do povo.</p>
+        </div>
+        <div style="padding: 14px; background: var(--paper); border-radius: 12px; border-left: 3px solid var(--accent);">
+          <div class="label" style="margin-bottom: 4px;">Grécia · 2</div>
+          <p style="font-family: var(--serif); font-size: 17px;"><strong>Filosofia</strong> — a razão humana, sozinha, entende o mundo.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== 65 ============== -->
+    <section class="slide">
+      <div style="margin-top: 14px; display: flex; flex-direction: column; gap: 10px;">
+        <div style="padding: 14px; background: var(--paper); border-radius: 12px; border-left: 3px solid var(--accent);">
+          <div class="label" style="margin-bottom: 4px;">Roma · 1</div>
+          <p style="font-family: var(--serif); font-size: 17px;"><strong>República</strong> — poder com freios, contrapesos, mandato e separação.</p>
+        </div>
+        <div style="padding: 14px; background: var(--paper); border-radius: 12px; border-left: 3px solid var(--accent);">
+          <div class="label" style="margin-bottom: 4px;">Roma · 2</div>
+          <p style="font-family: var(--serif); font-size: 17px;"><strong>Direito</strong> — sistema de regras: contrato, herança, propriedade, casamento.</p>
+        </div>
+      </div>
+      <p class="big" style="margin-top: 18px; text-align: center;">Grécia pensou. Roma construiu.</p>
+    </section>
+
+    <!-- ============== 66 ============== -->
+    <section class="slide">
+      <p class="quote">As duas, juntas, são o esqueleto invisível da nossa vida.</p>
+    </section>
+
+    <!-- ============== 67 — guarda essa ============== -->
+    <section class="slide">
+      <div class="eyebrow">Guarda essa</div>
+      <p>Quando alguém te disser que história antiga não serve pra nada — que é coisa de gente morta, que é decoreba…</p>
+      <p class="big" style="margin-top: 14px;">Lembra disso.</p>
+    </section>
+
+    <!-- ============== 68 ============== -->
+    <section class="slide">
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <div style="padding: 14px; background: var(--paper); border-radius: 12px;">
+          <p style="font-family: var(--serif); font-size: 16px;">Você <strong>vota</strong> porque um grego inventou.</p>
+        </div>
+        <div style="padding: 14px; background: var(--paper); border-radius: 12px;">
+          <p style="font-family: var(--serif); font-size: 16px;">Você <strong>assina contrato</strong> porque um romano inventou.</p>
+        </div>
+        <div style="padding: 14px; background: var(--paper); border-radius: 12px;">
+          <p style="font-family: var(--serif); font-size: 16px;">Você pode <strong>questionar o que o padre fala</strong> porque um filósofo grego começou a questionar há 25 séculos.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== 69 ============== -->
+    <section class="slide">
+      <p class="big" style="text-align: center;">A história antiga não tá morta.</p>
+      <p style="margin-top: 18px; text-align: center; font-family: var(--serif); font-style: italic; font-size: 22px; color: var(--accent);">Ela tá viva. Dentro de você. Agora.</p>
+    </section>
+
+    <!-- ============== 70 — gancho próxima ============== -->
+    <section class="slide">
+      <div class="eyebrow">Pergunta pra próxima aula</div>
+      <p class="big">Se Grécia e Roma foram tão geniais…</p>
+      <p class="big" style="margin-top: 6px;">por que elas caíram?</p>
+      <p style="margin-top: 16px;">Como uma civilização que durou mil anos, com exército profissional, lei escrita, estradas, aquedutos…</p>
+      <p style="margin-top: 8px;"><strong>simplesmente desabou?</strong></p>
+    </section>
+
+    <!-- ============== 71 ============== -->
+    <section class="slide">
+      <p>A resposta tem a ver com uma palavra que vai aparecer muito daqui pra frente:</p>
+      <p class="big" style="margin-top: 14px; color: var(--accent); font-style: italic;">Decadência.</p>
+      <p class="quote" style="margin-top: 16px;">Todo sistema, por mais forte que pareça, tem dentro de si o motivo da sua própria queda.</p>
+      <p style="margin-top: 14px; color: var(--ink-soft);">Mas isso é papo da próxima aula. Até lá.</p>
+    </section>
+
+    <!-- ============== 72 — INTRO QUIZ ============== -->
+    <section class="slide quiz-intro">
+      <div class="quiz-icon">?</div>
+      <div class="eyebrow" style="text-align: center;">Hora do quiz</div>
+      <h2>Bora ver o que ficou.</h2>
+      <p style="margin-top: 14px;">Cinco perguntas rápidas.<br>Se errar, eu te explico na hora.</p>
+    </section>
+
+    <!-- ============== 73 — QUIZ 1 ============== -->
+    <section class="slide" data-quiz="1">
+      <div class="question-num">Pergunta 1 de 5</div>
+      <div class="question">A palavra "política" vem de onde?</div>
+      <div class="options">
+        <button class="option" data-correct="false" data-explain="Não. Política não vem do latim. Vem do grego — da palavra que os gregos usavam pra cidade.">
+          <span class="letter">A</span><span>Do latim, do tempo dos romanos.</span>
+        </button>
+        <button class="option" data-correct="true" data-explain="">
+          <span class="letter">B</span><span>De <em>polis</em>, que era como os gregos chamavam a cidade.</span>
+        </button>
+        <button class="option" data-correct="false" data-explain="Não. A palavra é muito mais velha que o francês — vem da Grécia antiga, há mais de 2.000 anos.">
+          <span class="letter">C</span><span>Do francês, na Idade Média.</span>
+        </button>
+      </div>
+      <div class="feedback right" data-fb="right"><span class="head">Mandou bem.</span>Isso. Política era literalmente "<strong>a coisa que a gente faz na polis</strong>" — a coisa da cidade. Veio direto do grego.</div>
+      <div class="feedback miss" data-fb="miss"><span class="head">Quase.</span><span data-explain-text></span><br><br><strong>A certa é a B.</strong> Política vem de <em>polis</em>, que era como os gregos chamavam a cidade.</div>
+    </section>
+
+    <!-- ============== 74 — QUIZ 2 ============== -->
+    <section class="slide" data-quiz="2">
+      <div class="question-num">Pergunta 2 de 5</div>
+      <div class="question">A democracia ateniense era <em>universal</em>? Todo mundo votava?</div>
+      <div class="options">
+        <button class="option" data-correct="false" data-explain="Não. Mulher, escravo e estrangeiro NÃO votavam. Só uns 10% da população decidia.">
+          <span class="letter">A</span><span>Sim, todo mundo da cidade tinha voto.</span>
+        </button>
+        <button class="option" data-correct="false" data-explain="Não. Era pior que isso. Nem todos os homens votavam — só os nascidos em Atenas, de pai e mãe atenienses.">
+          <span class="letter">B</span><span>Só os homens, mas TODOS os homens.</span>
+        </button>
+        <button class="option" data-correct="true" data-explain="">
+          <span class="letter">C</span><span>Não. Só homem adulto, nascido em Atenas. Mulher, escravo e estrangeiro ficavam de fora. Uns 10% da população.</span>
+        </button>
+      </div>
+      <div class="feedback right" data-fb="right"><span class="head">Isso aí.</span>Era democracia, sim. Mas <strong>bem restrita</strong>. Mesmo assim, foi um salto gigante — porque a IDEIA de poder vindo de baixo pra cima ficou pra sempre.</div>
+      <div class="feedback miss" data-fb="miss"><span class="head">Quase.</span><span data-explain-text></span><br><br><strong>A certa é a C.</strong> Mulher, escravo e estrangeiro não votavam. Só uns 10% da população decidia pelos outros 90%.</div>
+    </section>
+
+    <!-- ============== 75 — QUIZ 3 ============== -->
+    <section class="slide" data-quiz="3">
+      <div class="question-num">Pergunta 3 de 5</div>
+      <div class="question">Qual foi a grande sacada da filosofia grega?</div>
+      <div class="options">
+        <button class="option" data-correct="false" data-explain="Não. Os gregos não inventaram religião nova — pelo contrário, começaram a questionar a explicação religiosa pra tudo.">
+          <span class="letter">A</span><span>Inventar uma nova religião com mais deuses.</span>
+        </button>
+        <button class="option" data-correct="true" data-explain="">
+          <span class="letter">B</span><span>Que o ser humano pode usar a própria razão pra entender o mundo — sem precisar de revelação divina.</span>
+        </button>
+        <button class="option" data-correct="false" data-explain="Não. Os gregos não fizeram livro sagrado nenhum. Eles ABRIRAM mão da explicação religiosa pra tentar entender o mundo só com a cabeça.">
+          <span class="letter">C</span><span>Escrever um livro sagrado novo.</span>
+        </button>
+      </div>
+      <div class="feedback right" data-fb="right"><span class="head">Exato.</span>Essa virada — usar a razão sozinha pra explicar o mundo — é o que, 2.000 anos depois, fez nascer a <strong>ciência moderna</strong>. Tua dor de cabeça curada por remédio? Tua internet? Vem daí.</div>
+      <div class="feedback miss" data-fb="miss"><span class="head">Quase.</span><span data-explain-text></span><br><br><strong>A certa é a B.</strong> Os gregos pararam de aceitar "deus quis" como resposta. Começaram a usar razão e observação. Foi essa virada que abriu o caminho da ciência.</div>
+    </section>
+
+    <!-- ============== 76 — QUIZ 4 ============== -->
+    <section class="slide" data-quiz="4">
+      <div class="question-num">Pergunta 4 de 5</div>
+      <div class="question">Por que Roma criou a república, em 509 a.C.?</div>
+      <div class="options">
+        <button class="option" data-correct="false" data-explain="Não. Os gregos não impuseram nada a Roma. Foi decisão dos próprios romanos.">
+          <span class="letter">A</span><span>Porque os gregos ensinaram eles.</span>
+        </button>
+        <button class="option" data-correct="true" data-explain="">
+          <span class="letter">B</span><span>Porque expulsaram o último rei (Tarquínio, um tirano) e juraram nunca mais aceitar rei em Roma.</span>
+        </button>
+        <button class="option" data-correct="false" data-explain="Não. A república veio MUITO antes do cristianismo. Em 509 a.C. nem Cristo tinha nascido.">
+          <span class="letter">C</span><span>Porque um padre cristão mandou eles fazerem.</span>
+        </button>
+      </div>
+      <div class="feedback right" data-fb="right"><span class="head">É isso.</span>Os romanos cansaram de tirano. Criaram um sistema com <strong>2 cônsules eleitos, mandato de 1 ano, senado e assembleias</strong>. Poderes separados, há 2.500 anos.</div>
+      <div class="feedback miss" data-fb="miss"><span class="head">Quase.</span><span data-explain-text></span><br><br><strong>A certa é a B.</strong> Roma expulsou o rei Tarquínio e jurou nunca mais aceitar rei. Criaram a <em>res publica</em> — coisa pública.</div>
+    </section>
+
+    <!-- ============== 77 — QUIZ 5 ============== -->
+    <section class="slide" data-quiz="5">
+      <div class="question-num">Pergunta 5 de 5</div>
+      <div class="question">Qual a diferença entre "ter lei escrita" (que o Egito já tinha) e o "direito" que Roma inventou?</div>
+      <div class="options">
+        <button class="option" data-correct="false" data-explain="Não tem nada a ver com idioma. O que importa é o que Roma fez COM a lei.">
+          <span class="letter">A</span><span>O direito romano era em latim, e o egípcio em hieróglifo.</span>
+        </button>
+        <button class="option" data-correct="false" data-explain="Não. O Código de Hamurábi, da Mesopotâmia (1.800 a.C.), é mais velho que Roma. Antiguidade não é o critério.">
+          <span class="letter">B</span><span>O direito romano era mais antigo.</span>
+        </button>
+        <button class="option" data-correct="true" data-explain="">
+          <span class="letter">C</span><span>Roma transformou o direito em ciência — estudou, debateu, refinou. Criou advogado, juiz, processo, contrato, herança.</span>
+        </button>
+      </div>
+      <div class="feedback right" data-fb="right"><span class="head">Isso.</span>Roma estudou direito por <strong>mil anos</strong>. Criou tudo que a gente usa hoje: contrato, propriedade, herança, casamento civil. Quando você assina um aluguel, tá usando direito romano.</div>
+      <div class="feedback miss" data-fb="miss"><span class="head">Quase.</span><span data-explain-text></span><br><br><strong>A certa é a C.</strong> A novidade foi transformar o direito em ciência refinada — com advogado, juiz, processo, contrato. Por isso virou base de quase todo país ocidental.</div>
+    </section>
+
+    <!-- ============== 78 — END ============== -->
+    <section class="slide end">
+      <div class="eyebrow" style="color: var(--accent-soft);">Aula 5 finalizada</div>
+      <h2>Fechou.</h2>
+      <div class="score" id="score">0/5</div>
+      <p id="endMsg">A próxima aula vai te mostrar como tudo isso desabou.</p>
+      <button class="restart" id="restartBtn">Voltar ao início</button>
+    </section>
+
+  </div>
+
+  <div class="tap-zone left" id="tapLeft"></div>
+  <div class="tap-zone right" id="tapRight"></div>
+</div>
+
+<script>
+(function(){
+  const slidesEl = document.getElementById('slides');
+  const slides = Array.from(slidesEl.querySelectorAll('.slide'));
+  const total = slides.length;
+  const progressEl = document.getElementById('progress');
+  const counterEl = document.getElementById('counter');
+  let current = 0;
+  let quizScore = 0;
+  let quizAnswered = {};
+
+  // Build progress segments
+  for (let i = 0; i < total; i++) {
+    const s = document.createElement('div');
+    s.className = 'seg';
+    s.dataset.idx = i;
+    progressEl.appendChild(s);
+  }
+  const segs = Array.from(progressEl.querySelectorAll('.seg'));
+
+  function update() {
+    slides.forEach((s, i) => {
+      s.classList.remove('active', 'prev');
+      if (i === current) s.classList.add('active');
+      else if (i < current) s.classList.add('prev');
+    });
+    segs.forEach((s, i) => {
+      s.classList.remove('done', 'current');
+      if (i < current) s.classList.add('done');
+      else if (i === current) s.classList.add('current');
+    });
+    counterEl.textContent = (current + 1) + ' / ' + total;
+
+    // Re-trigger animations
+    const active = slides[current];
+    active.querySelectorAll('.draw path, .draw line, .draw circle, .draw rect, .draw polygon, .draw polyline').forEach(el => {
+      el.style.animation = 'none';
+      el.offsetHeight;
+      el.style.animation = '';
+    });
+  }
+
+  function go(n) {
+    if (n < 0) n = 0;
+    if (n >= total) n = total - 1;
+    current = n;
+    update();
+  }
+
+  function next() { if (current < total - 1) go(current + 1); }
+  function prev() { if (current > 0) go(current - 1); }
+
+  // Tap zones
+  document.getElementById('tapLeft').addEventListener('click', prev);
+  document.getElementById('tapRight').addEventListener('click', next);
+
+  // Swipe
+  let touchStartX = 0, touchStartY = 0, touchStartT = 0;
+  slidesEl.addEventListener('touchstart', e => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchStartT = Date.now();
+  }, {passive: true});
+  slidesEl.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = e.changedTouches[0].clientY - touchStartY;
+    const dt = Date.now() - touchStartT;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.4 && dt < 600) {
+      if (dx < 0) next(); else prev();
+    }
+  }, {passive: true});
+
+  // Progress bar interactive (tap + drag)
+  let dragging = false;
+  function segFromX(x) {
+    const rect = progressEl.getBoundingClientRect();
+    const rel = (x - rect.left) / rect.width;
+    return Math.max(0, Math.min(total - 1, Math.floor(rel * total)));
+  }
+  progressEl.addEventListener('click', e => {
+    go(segFromX(e.clientX));
+  });
+  progressEl.addEventListener('touchstart', e => {
+    dragging = true;
+    go(segFromX(e.touches[0].clientX));
+  }, {passive: true});
+  progressEl.addEventListener('touchmove', e => {
+    if (!dragging) return;
+    go(segFromX(e.touches[0].clientX));
+  }, {passive: true});
+  progressEl.addEventListener('touchend', () => { dragging = false; });
+
+  // Keyboard (debug/desktop)
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') next();
+    if (e.key === 'ArrowLeft') prev();
+  });
+
+  // QUIZ logic
+  document.querySelectorAll('[data-quiz]').forEach(qSlide => {
+    const qId = qSlide.dataset.quiz;
+    const opts = qSlide.querySelectorAll('.option');
+    const fbRight = qSlide.querySelector('[data-fb="right"]');
+    const fbMiss = qSlide.querySelector('[data-fb="miss"]');
+    opts.forEach(opt => {
+      opt.addEventListener('click', () => {
+        if (quizAnswered[qId]) return;
+        quizAnswered[qId] = true;
+        const correct = opt.dataset.correct === 'true';
+        opts.forEach(o => {
+          o.classList.add('disabled');
+          if (o.dataset.correct === 'true') o.classList.add('correct');
+        });
+        if (correct) {
+          quizScore++;
+          fbRight.classList.add('show');
+        } else {
+          opt.classList.add('wrong');
+          const explainText = fbMiss.querySelector('[data-explain-text]');
+          if (explainText) explainText.textContent = opt.dataset.explain || '';
+          fbMiss.classList.add('show');
+        }
+      });
+    });
+  });
+
+  // End slide score
+  const scoreEl = document.getElementById('score');
+  const endMsgEl = document.getElementById('endMsg');
+  const restartBtn = document.getElementById('restartBtn');
+
+  // Update score when reaching end slide
+  const observer = new MutationObserver(() => {
+    const endSlide = document.querySelector('.slide.end');
+    if (endSlide && endSlide.classList.contains('active')) {
+      scoreEl.textContent = quizScore + '/5';
+      let msg = '';
+      if (quizScore === 5) msg = 'Acertou tudo. Tá voando.';
+      else if (quizScore >= 3) msg = 'Boa. A maior parte ficou. Revisa o resto.';
+      else msg = 'Tranquilo. Volta nos slides — essa aula é base pra tudo que vem.';
+      endMsgEl.textContent = msg;
+    }
+  });
+  slides.forEach(s => observer.observe(s, { attributes: true, attributeFilter: ['class'] }));
+
+  restartBtn.addEventListener('click', () => {
+    quizScore = 0;
+    quizAnswered = {};
+    document.querySelectorAll('.option').forEach(o => {
+      o.classList.remove('correct', 'wrong', 'disabled');
+    });
+    document.querySelectorAll('.feedback').forEach(f => f.classList.remove('show'));
+    go(0);
+  });
+
+  update();
+})();
+</script>
+
+</body>
+</html>
